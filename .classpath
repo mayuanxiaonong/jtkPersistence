@@ -2,6 +2,8 @@
 <classpath>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.7"/>
-	<classpathentry kind="lib" path="libs/jtk_util_0.1.jar"/>
+	<classpathentry kind="lib" path="/javaToolKit/dist/jtk_util_0.1.jar"/>
+	<classpathentry kind="lib" path="/jars/libs/commons-beanutils-1.9.1.jar" sourcepath="D:/workspace/_jars/commons-beanutils-1.9.1/commons-beanutils-1.9.1-sources.jar"/>
+	<classpathentry kind="lib" path="/jars/libs/commons-logging-1.1.2.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

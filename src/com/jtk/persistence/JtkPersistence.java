@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 
+import org.apache.commons.beanutils.ConvertUtils;
+
 import com.jtk.util.PropertiesUtil;
 import com.jtk.util.StringUtil;
 
@@ -21,15 +23,6 @@ import com.jtk.util.StringUtil;
  * the keys, or use {@link JtkNone} on member variables to declare they are not
  * keys in properties. If there is no {@link JtkKey} on a member variable, we
  * use the variable's name as key's name.
- * <p>
- * By now, we support types of properties values as follow: <blockquote><code>
- * <p>
- * byte, short, int, long, float, double, boolean, char.
- * <p>
- * Byte, Short, Integer, Long, Float, Double, Boolean, Character.
- * <p>
- * String. 
- * </code></blockquote>
  * 
  * @author Jason
  * @version 1.0
@@ -76,12 +69,6 @@ public class JtkPersistence {
 				continue;
 			}
 
-			// Is the type of field supported
-			if (!isSupported(f.getType())) {
-				throw new JtkPersistenceException("Unsupported type "
-						+ f.getType() + " of field " + f.getName());
-			}
-
 			// Get @JtkKey of field
 			JtkKey key = f.getAnnotation(JtkKey.class);
 			String keyName;
@@ -98,15 +85,8 @@ public class JtkPersistence {
 				continue;
 			}
 
-			// Cast value to type of field
-			Object value = null;
-			try {
-				value = cast(f.getType(), keyValue);
-			} catch (NumberFormatException e) {
-				throw new JtkPersistenceException(
-						"Cast " + keyValue + " to " + f.getType()
-								+ " of field " + f.getName() + " failed!", e);
-			}
+			// Convert value to type of field
+			Object value = ConvertUtils.convert(keyValue, f.getType());
 
 			// Set value to field
 			try {
@@ -156,12 +136,6 @@ public class JtkPersistence {
 			// Jump @JtkNone fields
 			if (f.getAnnotation(JtkNone.class) != null) {
 				continue;
-			}
-
-			// Is the type of field supported
-			if (!isSupported(f.getType())) {
-				throw new JtkPersistenceException("Unsupported type "
-						+ f.getType() + " of field " + f.getName());
 			}
 
 			// Get @JtkKey of field
@@ -223,70 +197,6 @@ public class JtkPersistence {
 		} catch (IOException e) {
 			throw new JtkPersistenceException("Load properties resource "
 					+ propertiesName + " error!", e);
-		}
-	}
-
-	/**
-	 * Return if the type of a field is supported
-	 * 
-	 * @param cls
-	 *            the type of a field
-	 * @return {@code true} if the type is supported, otherwise {@code false}
-	 */
-	private static boolean isSupported(Class<?> cls) {
-		return cls.isPrimitive() || cls == Byte.class || cls == Short.class
-				|| cls == Integer.class || cls == Long.class
-				|| cls == Float.class || cls == Double.class
-				|| cls == Character.class || cls == Boolean.class
-				|| cls == String.class;
-	}
-
-	/**
-	 * Cast a string value to the type of cls
-	 * 
-	 * @param cls
-	 *            the type of value to cast
-	 * @param s
-	 *            the value to cast
-	 * @return
-	 * @throws NumberFormatException
-	 */
-	private static Object cast(Class<?> cls, String s)
-			throws NumberFormatException {
-		if (cls == byte.class) {
-			return Byte.parseByte(s);
-		} else if (cls == short.class) {
-			return Short.parseShort(s);
-		} else if (cls == int.class) {
-			return Integer.parseInt(s);
-		} else if (cls == long.class) {
-			return Long.parseLong(s);
-		} else if (cls == float.class) {
-			return Float.parseFloat(s);
-		} else if (cls == double.class) {
-			return Double.parseDouble(s);
-		} else if (cls == boolean.class) {
-			return Boolean.parseBoolean(s);
-		} else if (cls == char.class) {
-			return s.charAt(0);
-		} else if (cls == Byte.class) {
-			return Byte.valueOf(s);
-		} else if (cls == Short.class) {
-			return Short.valueOf(s);
-		} else if (cls == Integer.class) {
-			return Integer.valueOf(s);
-		} else if (cls == Long.class) {
-			return Long.valueOf(s);
-		} else if (cls == Float.class) {
-			return Float.valueOf(s);
-		} else if (cls == Double.class) {
-			return Double.valueOf(s);
-		} else if (cls == Boolean.class) {
-			return Boolean.valueOf(s);
-		} else if (cls == Character.class) {
-			return Character.valueOf(s.charAt(0));
-		} else {
-			return s;
 		}
 	}
 
